@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  name      String
+  role      Role
+  doctor    Doctor?
+  patient   Patient?
+  createdAt DateTime  @default(now())
+}
+
+model Doctor {
+  id             Int           @id @default(autoincrement())
+  user           User          @relation(fields: [userId], references: [id])
+  userId         Int           @unique
+  specialty      String
+  experienceYears Int
+  location       String
+  fee            Int
+  rating         Float         @default(4.5)
+  appointments   Appointment[]
+}
+
+model Patient {
+  id           Int           @id @default(autoincrement())
+  user         User          @relation(fields: [userId], references: [id])
+  userId       Int           @unique
+  appointments Appointment[]
+}
+
+model Appointment {
+  id            Int           @id @default(autoincrement())
+  trackingId    String        @unique
+  doctor        Doctor        @relation(fields: [doctorId], references: [id])
+  doctorId      Int
+  patient       Patient       @relation(fields: [patientId], references: [id])
+  patientId     Int
+  date          DateTime
+  timeFrom      String
+  timeTo        String
+  symptoms      String
+  status        AppointmentStatus @default(PENDING)
+  prescription  Prescription?
+  createdAt     DateTime      @default(now())
+}
+
+model Prescription {
+  id            Int          @id @default(autoincrement())
+  appointment   Appointment  @relation(fields: [appointmentId], references: [id])
+  appointmentId Int          @unique
+  notes         String
+  medications   String       // JSON string or formatted text
+  invoiceAmount Int
+  createdAt     DateTime     @default(now())
+}
+
+enum Role {
+  PATIENT
+  DOCTOR
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
