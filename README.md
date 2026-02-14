@@ -41,6 +41,6 @@ npm run dev
 ```
 
 Update the `.env` file in `backend/` as needed (JWT secret, email credentials, etc.).
-Athour:Vedant Patil
+Author:Vedant Patil
 
 
